@@ -42,26 +42,6 @@ app.get('/api/callback', async (req, res) => {
   return res.send('<h1>You\'re in! Click <a href="/profile">here</a>!</h1>')
 })
 
-app.get('/api/callback', async (req, res) => {
-  const { state, code } = req.query as Record<string, string>
-  if (!req.session?.state || req.session.state !== state) {
-    return res.sendStatus(401)
-  }
-  const response = await fetch(generateTokenUrl(), {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded'
-    },
-    body: generateTokenRequestBody(code)
-  })
-  if (response.status !== 200) {
-    return res.sendStatus(response.status)
-  }
-  const data = await response.json() as { access_token: string }
-  req.session.token = data.access_token
-  return res.sendStatus(200)
-})
-
 app.get('/profile', async (req, res) => {
   const response = await fetch(generateProfileUrl(req.session?.token as string), {
     method: 'POST',
